@@ -1,0 +1,10 @@
+skip_files:
+    - (.*/)?\.Gitignore
+    - (.*/)?\.package.json
+    - (.*/)?README.md
+    - (.*/)?Gomfile
+    - (.*/)?.*\.yaml
+    - (.*/)?\.git/.*
+    - (.*/)?\..*
+    - (.*/)?src/quiz/vendor/(.*/)?
+
