@@ -4,3 +4,5 @@ import:
   version: ^3.0.3
   subpackages:
   - middleware
+- package: google.golang.org/appengine
+  version: ^1.0.0

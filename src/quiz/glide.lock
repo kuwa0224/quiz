@@ -1,8 +1,10 @@
-hash: 29c5248c08620830ea1b047c96b043fc483a2c9fcad7c18d8c1fbd6d63f31841
-updated: 2017-02-11T03:19:32.192690518+09:00
+hash: 3ce16873f0c4b4286885b0c299131cebe171404db2e4ee019a9c4ea17792dcf8
+updated: 2017-02-13T00:47:55.39655008+09:00
 imports:
-- name: github.com/dgrijalva/jwt-go
-  version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
+- name: github.com/golang/protobuf
+  version: 2402d76f3d41f928c7902a765dfc872356dd3aad
+  subpackages:
+  - proto
 - name: github.com/labstack/echo
   version: 8d504c1b699c757b267255c53b3e5219f9974abc
   subpackages:
@@ -10,10 +12,8 @@ imports:
 - name: github.com/labstack/gommon
   version: b2765095a572012ea4828c9596fefd824c2aee72
   subpackages:
-  - bytes
   - color
   - log
-  - random
 - name: github.com/mattn/go-colorable
   version: d228849504861217f796da67fae4f6e347643f15
 - name: github.com/mattn/go-isatty
@@ -36,4 +36,15 @@ imports:
   version: d75a52659825e75fff6158388dddc6a5b04f9ba5
   subpackages:
   - unix
+- name: google.golang.org/appengine
+  version: 150dc57a1b433e64154302bdc40b6bb8aefa313a
+  subpackages:
+  - internal
+  - internal/app_identity
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/modules
+  - internal/remote_api
+  - log
 testImports: []
