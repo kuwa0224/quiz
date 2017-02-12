@@ -17,7 +17,7 @@ type (
 func init() {
 
 	t := &Template{
-		templates: template.Must(template.ParseFiles("templates/top.html")),
+		templates: template.Must(template.ParseGlob("templates/*")),
 	}
 	e.Renderer = t
 
