@@ -5,6 +5,9 @@ import (
 	"io"
 	"net/http"
 
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/log"
+
 	"github.com/labstack/echo"
 )
 
@@ -25,9 +28,19 @@ func init() {
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
+	err := t.templates.ExecuteTemplate(w, name, data)
+	if err != nil {
+		gaec := appengine.NewContext(c.Request())
+		log.Errorf(gaec, "failed to execute template: %v", err)
+	}
+
+	return err
 }
 
 func top(c echo.Context) error {
-	return c.Render(http.StatusOK, "top", "Takeshi")
+	gaec := appengine.NewContext(c.Request())
+
+	log.Infof(gaec, "OK")
+
+	return c.Render(http.StatusOK, "toap", "Takeshi")
 }
