@@ -2,6 +2,10 @@ runtime: go
 api_version: go1
 
 handlers:
+    - url: /build/app.js
+      static_files: build/app.js
+      upload: build/app.js
+
     - url: /.*
       script: _go_app
 
