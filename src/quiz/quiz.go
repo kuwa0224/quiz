@@ -42,5 +42,5 @@ func top(c echo.Context) error {
 
 	log.Infof(gaec, "OK")
 
-	return c.Render(http.StatusOK, "toap", "Takeshi")
+	return c.Render(http.StatusOK, "top", "Takeshi")
 }
