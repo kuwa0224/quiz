@@ -12,17 +12,27 @@ import (
 func init() {
 	router := gin.Default()
 
-	router.LoadHTMLGlob("templates/*")
+	router.LoadHTMLFiles(
+		"templates/top.html",
+		"templates/admin/top.html",
+	)
+	// router.LoadHTMLGlob("templates/admin/top.html")
 	router.GET("/", top)
+	router.GET("/admin", admin)
 
 	http.Handle("/", router)
 }
 
 func top(c *gin.Context) {
-	ctx := appengine.WithContext(c, c.Request)
-	log.Infof(ctx, "OK")
+	ctx := appengine.NewContext(c.Request)
+	log.Infof(ctx, "show top")
 
-	c.HTML(http.StatusOK, "top.html", gin.H{
-		"name": "Takeshi",
-	})
+	c.HTML(http.StatusOK, "top.html", gin.H{})
+}
+
+func admin(c *gin.Context) {
+
+	// TODO 設定されたクイズの一覧を表示
+
+	c.HTML(http.StatusOK, "admin/top.html", gin.H{})
 }
