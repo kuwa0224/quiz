@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"google.golang.org/appengine"
+	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/log"
 
 	"gopkg.in/gin-gonic/gin.v1"
@@ -79,5 +80,13 @@ func QuizNew(c *gin.Context) {
 	}
 
 	log.Infof(ctx, "Post actually")
+	key := datastore.NewIncompleteKey(ctx, "quiz", nil)
+	key, err := datastore.Put(ctx, key, &qf.Quiz)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{})
 }
