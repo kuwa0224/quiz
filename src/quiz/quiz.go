@@ -20,6 +20,12 @@ type Quiz struct {
 	AnswerNote string   `json:"answerNote" binding:"required"`
 }
 
+type QuizForm struct {
+	ID        int64 `json:"id"`
+	Quiz      Quiz  `json:"quiz" binding:"required"`
+	CheckOnly bool  `json:"checkOnly" binding:"exists"`
+}
+
 func init() {
 	router := gin.Default()
 
@@ -59,12 +65,19 @@ func QuizNewForm(c *gin.Context) {
 func QuizNew(c *gin.Context) {
 	ctx := appengine.NewContext(c.Request)
 
-	var quiz Quiz
-	if err := c.BindJSON(&quiz); err != nil {
+	var qf QuizForm
+	if err := c.BindJSON(&qf); err != nil {
 		log.Errorf(ctx, "Failed to bind : %v", err)
-		c.JSON(http.StatusBadRequest, nil)
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	if qf.CheckOnly {
+		log.Infof(ctx, "Request is only for check")
+		c.JSON(http.StatusOK, gin.H{})
+		return
+	}
+
+	log.Infof(ctx, "Post actually")
+	c.JSON(http.StatusOK, gin.H{})
 }

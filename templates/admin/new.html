@@ -144,19 +144,23 @@
                 var answers = getAnswersArray();
                 var answerNote = getAnswerNote().val();
 
-                var reqData = {
+                var quizData = {
                     question: question,
                     answers: answers,
                     answerNote: answerNote,
-                    checkOnly: true
                 };
 
-                console.log(reqData);
-                var err = validate(reqData);
+                console.log(quizData);
+                var err = validate(quizData);
                 if ( err.length > 0 ) {
                     alert(err);
                     return false;
                 }
+
+                var reqData = {
+                    quiz: quizData,
+                    checkOnly: true
+                };
 
                 var errorCallback = function(xhr, textStatus, error) {
                     alert("failed to post data: " + textStatus)
