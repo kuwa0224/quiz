@@ -8,6 +8,7 @@
     <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script src="/static/js/jquery.tmpl.min.js"></script>
   </head>
   <body>
     <h3>Create New Quiz</h3>
@@ -20,29 +21,43 @@
 
             <div id="formAnswers" class="form-group">
                 <label>Answers</label>
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="radio" name="answerRadios" id="answerRadios1" value="option1">
-                        選択肢1
-                    </label>
-                </div>
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="radio" name="answerRadios" id="answerRadios2" value="option2">
-                        選択肢2
-                    </label>
-                </div>
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="radio" name="answerRadios" id="answerRadios3" value="option3">
-                        選択肢3
-                    </label>
+                <div id="formAnswerOptions">
+                    <!-- <div class="form&#45;check"> -->
+                    <!--     <label class="form&#45;check&#45;label"> -->
+                    <!--         <input class="form&#45;check&#45;input" type="radio" name="answerRadios" value="選択肢1"> -->
+                    <!--         選択肢1 -->
+                    <!--     </label> -->
+                    <!--     <span class="btn btn&#45;danger">削除</span> -->
+                    <!-- </div> -->
+                    <!-- <div class="form&#45;check"> -->
+                    <!--     <label class="form&#45;check&#45;label"> -->
+                    <!--         <input class="form&#45;check&#45;input" type="radio" name="answerRadios" value="選択肢2"> -->
+                    <!--         選択肢2 -->
+                    <!--     </label> -->
+                    <!--     <span class="btn btn&#45;danger">削除</span> -->
+                    <!-- </div> -->
+                    <!-- <div class="form&#45;check"> -->
+                    <!--     <label class="form&#45;check&#45;label"> -->
+                    <!--         <input class="form&#45;check&#45;input" type="radio" name="answerRadios" value="選択肢3"> -->
+                    <!--         選択肢3 -->
+                    <!--     </label> -->
+                    <!--     <span class="btn btn&#45;danger">削除</span> -->
+                    <!-- </div> -->
                 </div>
 
                 <div class="form-inline">
-                    <input type="text" name="title" class="form-inline">
+                    <input id="textAdditionalAnswer" type="text" class="form-inline">
                     <button>Add</button>
                 </div>
+
+                <template id="templateAnswer">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="answerRadios" value="${description}">
+                            ${description}
+                        </label>
+                    </div>
+                </template>
             </div>
 
             <div id="formAnswerNote" class="form-group">
@@ -57,10 +72,10 @@
         "use strict";
 
         function getQuestion() {
-            return $("#formQuestion").find("textarea")[0].value
+            return $($("#formQuestion").find("textarea")[0]);
         }
 
-        function getAnswers() {
+        function getAnswersArray() {
             var answerInputs = $("#formAnswers").find(".form-check-input");
 
             var answers = [];
@@ -75,8 +90,46 @@
             return answers;
         }
 
+        function getAnswerTemplate() {
+            return $("#templateAnswer");
+        }
+
         function getAnswerNote() {
-            return $("#formAnswerNote").find("textarea")[0].value
+            return $($("#formAnswerNote").find("textarea")[0]);
+        }
+
+        function getAdditionalAnswer() {
+            return $("#textAdditionalAnswer");
+        }
+
+        function validate(reqData) {
+            if ( reqData["question"] === "" ) {
+                return "question must not be empty";
+            }
+
+            if ( reqData["answers"].length <= 1 ) {
+                return "answers length must be over 1";
+            }
+
+            if ( reqData["answers"].findIndex(function(e) { return e.correct }) === -1 ) {
+                return "answers must have correct element";
+            }
+
+            if ( reqData["answerNote"] === "" ) {
+                return "answerNote must not be empty";
+            }
+
+            return "";
+        }
+
+        function addDeleteBtn(elem) {
+            var deleteBtn = $('<span class="btn btn-danger">削除</span>');
+
+            deleteBtn.on("click", function() {
+                elem.remove();
+            });
+
+            deleteBtn.appendTo(elem);
         }
 
         function request(reqData, successCallback, errorCallback) {
@@ -92,10 +145,25 @@
         }
 
         (function() {
-            $("#submitButton").click(function() {
-                var question = getQuestion();
-                var answers = getAnswers();
-                var answerNote = getAnswerNote();
+            $($("#formAnswers").find("button")[0]).on("click", function() {
+                var additionalAnswerText = getAdditionalAnswer().val();
+                if ( additionalAnswerText === "" ) {
+                    return false;
+                }
+
+                var answerTemplate = getAnswerTemplate();
+                var additionalAnswer = answerTemplate.tmpl({ description: additionalAnswerText });
+                addDeleteBtn(additionalAnswer);
+                additionalAnswer.appendTo("#formAnswerOptions");
+
+                getAdditionalAnswer().val("");
+                return false;
+            });
+
+            $("#submitButton").on("click", function() {
+                var question = getQuestion().val();
+                var answers = getAnswersArray();
+                var answerNote = getAnswerNote().val();
 
                 var reqData = {
                     question: question,
@@ -105,6 +173,11 @@
                 };
 
                 console.log(reqData);
+                var err = validate(reqData);
+                if ( err.length > 0 ) {
+                    alert(err);
+                    return false;
+                }
 
                 var errorCallback = function(xhr, textStatus, error) {
                     alert("failed to post data: " + textStatus)
@@ -119,8 +192,7 @@
                 }
 
                 request(reqData, successCallback, errorCallback);
-
-                return false
+                return false;
             })
         })();
     </script>
