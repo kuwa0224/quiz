@@ -16,15 +16,15 @@ type Answer struct {
 }
 
 type Quiz struct {
-	Question   string   `json:"question" binding:"required"`
-	Answers    []Answer `json:"answers" binding:"required"`
-	AnswerNote string   `json:"answerNote" binding:"required"`
+	ID         *datastore.Key `json:"id"`
+	Question   string         `json:"question" binding:"required"`
+	Answers    []Answer       `json:"answers" binding:"required"`
+	AnswerNote string         `json:"answerNote" binding:"required"`
 }
 
 type QuizForm struct {
-	ID        int64 `json:"id"`
-	Quiz      Quiz  `json:"quiz" binding:"required"`
-	CheckOnly bool  `json:"checkOnly" binding:"exists"`
+	Quiz      Quiz `json:"quiz" binding:"required"`
+	CheckOnly bool `json:"checkOnly" binding:"exists"`
 }
 
 func init() {
@@ -52,10 +52,17 @@ func Top(c *gin.Context) {
 }
 
 func QuizList(c *gin.Context) {
+	ctx := appengine.NewContext(c.Request)
 
 	// TODO 設定されたクイズの一覧を表示
+	q := datastore.NewQuery("Quiz")
 
-	c.HTML(http.StatusOK, "admin/top.html", gin.H{})
+	var quizList []Quiz
+	q.GetAll(ctx, &quizList)
+
+	log.Infof(ctx, "quiz List: %v", quizList)
+
+	c.HTML(http.StatusOK, "admin/top.html", gin.H{"QuizList": quizList})
 }
 
 func QuizNewForm(c *gin.Context) {
@@ -80,7 +87,8 @@ func QuizNew(c *gin.Context) {
 	}
 
 	log.Infof(ctx, "Post actually")
-	key := datastore.NewIncompleteKey(ctx, "quiz", nil)
+	key := datastore.NewIncompleteKey(ctx, "Quiz", nil)
+	qf.Quiz.ID = key
 	key, err := datastore.Put(ctx, key, &qf.Quiz)
 
 	if err != nil {
